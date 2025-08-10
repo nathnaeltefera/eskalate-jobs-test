@@ -1,6 +1,5 @@
 import { prisma } from '../utils/database';
 import { uploadResumeToCloudinary } from '../utils/cloudinary';
-import { sendApplicationNotification, sendStatusUpdateEmail } from '../utils/email';
 import { PaginationParams } from '../types';
 
 export class ApplicationService {
@@ -66,12 +65,7 @@ export class ApplicationService {
       },
     });
 
-    // Send notification email to company
-    await sendApplicationNotification(
-      job.creator.email,
-      job.title,
-      applicant!.name
-    );
+    // Email notifications disabled
 
     return {
       id: application.id,
@@ -299,14 +293,7 @@ export class ApplicationService {
       },
     });
 
-    // Send email notification for specific status changes
-    if (['Interview', 'Rejected', 'Hired'].includes(newStatus)) {
-      await sendStatusUpdateEmail(
-        updatedApplication.applicant.email,
-        updatedApplication.job.title,
-        newStatus
-      );
-    }
+    // Email notifications for status changes disabled
 
     return {
       id: updatedApplication.id,

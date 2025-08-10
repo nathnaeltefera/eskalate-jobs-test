@@ -50,6 +50,20 @@ app.use('/api', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Setup Swagger documentation FIRST
+setupSwagger(app);
+
+// Redirect routes (before other middlewares can interfere)
+app.get('/', (req, res) => {
+  console.log('Root route hit, redirecting to /api/docs');
+  res.redirect('/api/docs');
+});
+
+app.get('/docs', (req, res) => {
+  console.log('/docs route hit, redirecting to /api/docs');
+  res.redirect('/api/docs');
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -68,14 +82,6 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api', jobsRouter);
 app.use('/api', applicationsRouter);
-
-// Setup Swagger documentation
-setupSwagger(app);
-
-// Redirect root to API docs
-app.get('/', (req, res) => {
-  res.redirect('/api/docs');
-});
 
 // 404 handler
 app.use('*', (req, res) => {

@@ -213,12 +213,21 @@ const options = {
       },
     ],
   },
-  apis: ['./src/routes/*.ts'], // Path to the API docs
+  apis: [
+    './src/routes/*.ts', // Development
+    './dist/routes/*.js' // Production
+  ], // Path to the API docs
 };
 
 const specs = swaggerJsdoc(options);
 
 export const setupSwagger = (app: Express): void => {
+  // Debug middleware to check if swagger routes are being hit
+  app.use('/api/docs*', (req, res, next) => {
+    console.log(`Swagger route hit: ${req.method} ${req.originalUrl}`);
+    next();
+  });
+
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs, {
     explorer: true,
     customCss: '.swagger-ui .topbar { display: none }',
@@ -230,4 +239,6 @@ export const setupSwagger = (app: Express): void => {
     res.setHeader('Content-Type', 'application/json');
     res.send(specs);
   });
+  
+  console.log('✅ Swagger setup completed');
 };

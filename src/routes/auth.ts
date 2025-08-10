@@ -45,26 +45,7 @@ const router = Router();
  */
 router.post('/signup', validateBody(signupSchema), authController.signup);
 
-/**
- * @swagger
- * /api/auth/verify-email:
- *   get:
- *     summary: Verify email address
- *     tags: [Authentication]
- *     parameters:
- *       - in: query
- *         name: token
- *         required: true
- *         schema:
- *           type: string
- *         description: Email verification token
- *     responses:
- *       200:
- *         description: Email verified successfully
- *       400:
- *         description: Invalid or expired token
- */
-router.get('/verify-email', authController.verifyEmail);
+// Email verification route removed - users are auto-verified
 
 /**
  * @swagger
@@ -96,5 +77,62 @@ router.get('/verify-email', authController.verifyEmail);
  *         description: Email not verified
  */
 router.post('/login', validateBody(loginSchema), authController.login);
+
+/**
+ * @swagger
+ * /api/auth/test:
+ *   post:
+ *     summary: Test authentication (Development only)
+ *     tags: [Authentication]
+ *     description: Creates/finds a test user and returns a JWT token for testing. Only works in development mode.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: test@example.com
+ *               role:
+ *                 type: string
+ *                 enum: [applicant, company]
+ *                 default: company
+ *                 example: company
+ *     responses:
+ *       200:
+ *         description: Test authentication successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Test authentication successful (Development only)
+ *                 object:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *                     instructions:
+ *                       type: string
+ *                       example: "Use this token in the Authorization header: Bearer <token>"
+ *       400:
+ *         description: Validation error
+ *       404:
+ *         description: Endpoint not available in production
+ */
+router.post('/test', authController.testAuth);
 
 export { router as authRouter };
